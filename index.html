@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OUR DREAMS - CSA EXAM</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="font-family:Arial;padding:20px;max-width:700px;margin:auto">
+<div style="background:#007bff;color:white;padding:15px;text-align:center;border-radius:8px">
+    <h1>OUR DREAMS - CSA EXAM</h1>
+    <p>Time: 8:00 AM to 8:00 PM Only</p>
+</div>
+<form>
+    <h3>Student Details:</h3>
+    Name: <input type="text" id="sName"><br><br>
+    Last 4 Digits: <input type="text" id="sID"><br><br>
+    
+    <div style="margin:20px 0;padding:15px;border:2px solid #007bff;border-radius:8px">
+        <p><b>1. CSA అంటే ఏమిటి?</b></p>
+        <input type="radio" name="q1" value="B"> Customer Service Associate<br>
+        <input type="radio" name="q1" value="A"> Computer Service<br>
+    </div>
+    
+    <button type="button" onclick="alert('Exam Submitted!')" style="padding:12px 20px;background:green;color:white;border:none;border-radius:5px">Submit Exam</button>
+</form>
+
+<script>
+var h = new Date().getHours();
+if(h<8||h>=20){document.body.innerHTML='<h1 style="text-align:center;margin-top:100px">Exam Closed<br>8:00 AM to 8:00 PM Only</h1>'}
+</script>
+</body>
+</html>
