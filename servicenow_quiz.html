@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OUR Dreams ServiceNOW Developer</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #0a0a2e, #1a1a5e, #0d47a1); min-height: 100vh; color: #fff; }
+  .screen { display: none; min-height: 100vh; padding: 20px; }
+  .screen.active { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .card { background: rgba(255,255,255,0.08); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; padding: 40px; max-width: 700px; width: 100%; }
+  h1 { font-size: 2em; text-align: center; background: linear-gradient(90deg, #00e5ff, #7c4dff, #00bfa5); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+  h2 { font-size: 1.4em; text-align: center; color: #00e5ff; margin-bottom: 25px; }
+  .subtitle { text-align: center; color: #b0bec5; margin-bottom: 30px; font-size: 0.95em; }
+  input { width: 100%; padding: 14px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.1); color: #fff; font-size: 1em; margin-bottom: 15px; outline: none; }
+  input::placeholder { color: #90a4ae; }
+  input:focus { border-color: #00e5ff; }
+  .btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: all 0.3s; }
+  .btn-primary { background: linear-gradient(135deg, #00e5ff, #7c4dff); color: #fff; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+  .btn-admin { background: rgba(255,255,255,0.1); color: #00e5ff; border: 1px solid #00e5ff; margin-top: 10px; }
+  .btn-admin:hover { background: rgba(0,229,255,0.1); }
+  .info-box { display: flex; justify-content: space-around; background: rgba(0,229,255,0.1); border-radius: 12px; padding: 15px; margin-bottom: 25px; }
+  .info-item { text-align: center; }
+  .info-item .val { font-size: 1.5em; font-weight: bold; color: #00e5ff; }
+  .info-item .lbl { font-size: 0.75em; color: #b0bec5; }
+  /* Quiz Screen */
+  #quizScreen { justify-content: flex-start; padding-top: 10px; }
+  .quiz-header { width: 100%; max-width: 700px; display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: rgba(0,0,0,0.3); border-radius: 12px; margin-bottom: 15px; }
+  .timer { font-size: 1.5em; font-weight: bold; color: #00e5ff; }
+  .timer.warn { color: #ff5252; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  .q-count { font-size: 0.9em; color: #b0bec5; }
+  .tab-warn { background: rgba(255,82,82,0.2); border: 1px solid #ff5252; border-radius: 8px; padding: 8px 15px; text-align: center; font-size: 0.85em; color: #ff5252; margin-bottom: 10px; width: 100%; max-width: 700px; display: none; }
+  .question-card { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; padding: 25px; max-width: 700px; width: 100%; margin-bottom: 15px; }
+  .q-text { font-size: 1.05em; margin-bottom: 20px; line-height: 1.6; color: #e0e0e0; }
+  .q-num { color: #00e5ff; font-weight: bold; }
+  .option { display: flex; align-items: center; padding: 12px 16px; border-radius: 10px; margin-bottom: 10px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15); transition: all 0.2s; }
+  .option:hover { background: rgba(0,229,255,0.1); border-color: #00e5ff; }
+  .option.selected { background: rgba(124,77,255,0.3); border-color: #7c4dff; }
+  .option input[type=radio] { margin-right: 12px; accent-color: #7c4dff; transform: scale(1.3); }
+  .nav-btns { display: flex; gap: 10px; max-width: 700px; width: 100%; }
+  .btn-nav { flex: 1; padding: 12px; border-radius: 10px; border: none; font-size: 1em; cursor: pointer; font-weight: bold; }
+  .btn-prev { background: rgba(255,255,255,0.1); color: #fff; }
+  .btn-next { background: linear-gradient(135deg, #00e5ff, #7c4dff); color: #fff; }
+  .btn-submit { background: linear-gradient(135deg, #00bfa5, #00e5ff); color: #fff; }
+  .progress-bar { width: 100%; max-width: 700px; background: rgba(255,255,255,0.1); border-radius: 10px; height: 6px; margin-bottom: 10px; }
+  .progress-fill { height: 6px; border-radius: 10px; background: linear-gradient(90deg, #00e5ff, #7c4dff); transition: width 0.3s; }
+  /* Result Screen */
+  .score-circle { width: 150px; height: 150px; border-radius: 50%; background: conic-gradient(#00e5ff var(--pct), rgba(255,255,255,0.1) 0); display: flex; align-items: center; justify-content: center; margin: 20px auto; position: relative; }
+  .score-inner { width: 120px; height: 120px; border-radius: 50%; background: #0d1b5e; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-num { font-size: 2em; font-weight: bold; color: #00e5ff; }
+  .score-den { font-size: 0.85em; color: #b0bec5; }
+  .result-msg { text-align: center; font-size: 1.1em; margin: 10px 0 20px; }
+  .lock-msg { text-align: center; background: rgba(255,193,7,0.15); border: 1px solid #ffc107; border-radius: 10px; padding: 15px; color: #ffc107; font-size: 0.95em; }
+  /* Leaderboard */
+  .lb-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+  .lb-table th { background: rgba(0,229,255,0.2); padding: 10px; text-align: left; font-size: 0.85em; color: #00e5ff; }
+  .lb-table td { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.9em; }
+  .lb-table tr:hover td { background: rgba(255,255,255,0.05); }
+  .rank-1 { color: #ffd700; font-weight: bold; }
+  .rank-2 { color: #c0c0c0; font-weight: bold; }
+  .rank-3 { color: #cd7f32; font-weight: bold; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.75em; }
+  .badge-pass { background: rgba(0,200,83,0.2); color: #00c853; border: 1px solid #00c853; }
+  .badge-fail { background: rgba(255,82,82,0.2); color: #ff5252; border: 1px solid #ff5252; }
+  .error { color: #ff5252; font-size: 0.9em; text-align: center; margin-top: 10px; }
+  .answer-review { margin-top: 20px; }
+  .ans-item { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 12px; margin-bottom: 10px; border-left: 4px solid #00c853; }
+  .ans-item.wrong { border-left-color: #ff5252; }
+  .ans-q { font-size: 0.9em; color: #b0bec5; margin-bottom: 5px; }
+  .ans-correct { color: #00c853; font-size: 0.85em; }
+  .ans-yours { color: #ff5252; font-size: 0.85em; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="screen active">
+  <div class="card">
+    <h1>OUR Dreams</h1>
+    <h2>ServiceNOW Developer</h2>
+    <p class="subtitle">ITSM Module – CSA Sample Test</p>
+    <p style="text-align:center;color:#ffd700;font-size:0.95em;margin-bottom:5px;">👨‍🏫 Conducted by: <strong>Mallikarjuna Y</strong></p>
+    <div class="info-box">
+      <div class="info-item"><div class="val">25</div><div class="lbl">Questions</div></div>
+      <div class="info-item"><div class="val">20</div><div class="lbl">Minutes</div></div>
+      <div class="info-item"><div class="val">25</div><div class="lbl">Marks</div></div>
+      <div class="info-item"><div class="val">CSA</div><div class="lbl">Pattern</div></div>
+    </div>
+    <input type="text" id="phoneInput" placeholder="📱 Enter Last 4 Digits of Phone Number" maxlength="4" />
+    <input type="password" id="passInput" placeholder="🔐 Enter Access Password" />
+    <div id="loginError" class="error"></div>
+    <button class="btn btn-primary" onclick="startExam()">🚀 Start Exam</button>
+    <button class="btn btn-admin" onclick="showAdminLogin()">🔑 Admin View</button>
+  </div>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLoginScreen" class="screen">
+  <div class="card">
+    <h2>🔑 Admin Login</h2>
+    <input type="password" id="adminPassInput" placeholder="Enter Admin Password" />
+    <div id="adminError" class="error"></div>
+    <button class="btn btn-primary" onclick="adminLogin()">Login</button>
+    <button class="btn btn-admin" style="margin-top:10px" onclick="showScreen('loginScreen')">← Back</button>
+  </div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="quizScreen" class="screen">
+  <div class="quiz-header">
+    <div>
+      <div style="font-size:0.85em;color:#b0bec5;">OUR Dreams ServiceNOW</div>
+      <div id="studentLabel" style="font-size:0.9em;color:#00e5ff;"></div>
+    </div>
+    <div class="timer" id="timerDisplay">20:00</div>
+    <div class="q-count" id="qCount">Q 1/25</div>
+  </div>
+  <div class="tab-warn" id="tabWarn"></div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:4%"></div></div>
+  <div class="question-card">
+    <div class="q-text" id="qText"></div>
+    <div id="optionsDiv"></div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn-nav btn-prev" onclick="prevQ()">← Prev</button>
+    <button class="btn-nav btn-next" id="nextBtn" onclick="nextQ()">Next →</button>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="resultScreen" class="screen">
+  <div class="card">
+    <h1>OUR Dreams ServiceNOW</h1>
+    <h2>📊 Your Result</h2>
+    <div class="score-circle" id="scoreCircle">
+      <div class="score-inner">
+        <div class="score-num" id="scoreNum">0</div>
+        <div class="score-den">out of 25</div>
+      </div>
+    </div>
+    <div class="result-msg" id="resultMsg"></div>
+    <div style="text-align:center;margin-bottom:10px;">
+      <span style="color:#b0bec5;font-size:0.9em;">⏱️ Time Taken: </span>
+      <span id="timeTaken" style="color:#00e5ff;font-weight:bold;"></span>
+    </div>
+    <div class="lock-msg" id="lockMsg">
+      🔒 Full Leaderboard & Rankings unlock at <strong>8:00 PM</strong> today.<br>
+      Please check back then to see your rank!
+    </div>
+    <div class="answer-review" id="answerReview"></div>
+    <button class="btn btn-admin" style="margin-top:20px" onclick="showScreen('loginScreen')">🏠 Home</button>
+  </div>
+</div>
+
+<!-- LEADERBOARD SCREEN -->
+<div id="leaderScreen" class="screen">
+  <div class="card">
+    <h1>OUR Dreams ServiceNOW</h1>
+    <h2>🏆 Leaderboard</h2>
+    <div id="lbContent"></div>
+    <button class="btn btn-admin" style="margin-top:20px" onclick="showScreen('loginScreen')">🏠 Home</button>
+    <p style="text-align:center;margin-top:18px;color:#b0bec5;font-size:0.78em;">© Designed & Conducted by <strong style="color:#ffd700;">Mallikarjuna Y</strong> | OUR Dreams ServiceNOW</p>
+  </div>
+</div>
+
+<script>
+// ===================== DATA =====================
+const ADMIN_PASS = "SN@26";
+const STUDENT_PASS = "SN@26";
+const RESULT_EMAIL = "blrmalli90@gmail.com";
+const UNLOCK_HOUR = 20; // 8 PM
+
+const questions = [
+  { q: "What does ITSM stand for?", opts: ["IT Service Management","IT System Monitoring","Integrated Technology Service Model","Information Technology Security Management"], ans: 0 },
+  { q: "Which ServiceNow module is used to manage incidents?", opts: ["Problem Management","Change Management","Incident Management","Request Management"], ans: 2 },
+  { q: "What is the primary goal of Incident Management?", opts: ["Prevent future incidents","Restore normal service as quickly as possible","Manage changes to IT infrastructure","Track configuration items"], ans: 1 },
+  { q: "In ServiceNow, what is a 'Record Producer'?", opts: ["A tool to create reports","A catalog item that creates records in any table","A workflow activity","A business rule"], ans: 1 },
+  { q: "What is a Configuration Item (CI) in ServiceNow?", opts: ["A form field","Any component that needs to be managed to deliver an IT service","A type of report","A user role"], ans: 1 },
+  { q: "Which table stores Incident records in ServiceNow?", opts: ["task","sc_request","incident","problem"], ans: 2 },
+  { q: "What does SLA stand for in ITSM?", opts: ["Software License Agreement","Service Level Agreement","System Load Analysis","Service Log Activity"], ans: 1 },
+  { q: "Which of the following is NOT a state in Incident Management?", opts: ["New","In Progress","Pending","Archived"], ans: 3 },
+  { q: "What is the purpose of a Knowledge Base in ServiceNow?", opts: ["Store configuration items","Provide self-service information to users","Track software licenses","Manage user roles"], ans: 1 },
+  { q: "In ServiceNow, 'Assignment Group' refers to?", opts: ["A group of reports","A team responsible for resolving a ticket","A set of workflow activities","A collection of catalog items"], ans: 1 },
+  { q: "What is Problem Management primarily focused on?", opts: ["Quick resolution of incidents","Identifying and eliminating root causes of incidents","Managing user requests","Controlling changes"], ans: 1 },
+  { q: "Which ServiceNow feature allows automated actions based on conditions?", opts: ["UI Policy","Business Rules","Both A and B","Access Control List"], ans: 2 },
+  { q: "What is a 'Change Request' in ServiceNow?", opts: ["A user's request for a new service","A formal request to modify IT infrastructure","An incident escalation","A problem ticket"], ans: 1 },
+  { q: "Which role in ServiceNow has full administrative access?", opts: ["itil","admin","fulfiller","approver"], ans: 1 },
+  { q: "What does CMDB stand for?", opts: ["Configuration Management Database","Change Management Data Base","Centralized Module Data Bank","Configuration Monitoring Dashboard"], ans: 0 },
+  { q: "In ServiceNow, what is a 'Flow Designer' used for?", opts: ["Designing UI forms","Automating processes and workflows","Creating reports","Managing user accounts"], ans: 1 },
+  { q: "What is the difference between Incident and Problem in ITSM?", opts: ["They are the same","Incident is unplanned disruption; Problem is root cause of incidents","Problem is faster to resolve","Incident involves hardware only"], ans: 1 },
+  { q: "Which ServiceNow table is the parent of most task-based tables?", opts: ["sys_user","task","cmdb_ci","sc_cat_item"], ans: 1 },
+  { q: "What is 'Escalation' in Incident Management?", opts: ["Closing an incident","Transferring incident to higher support level","Creating a problem record","Deleting an incident"], ans: 1 },
+  { q: "Which of the following is a valid ServiceNow application scope?", opts: ["Global","Private","Shared","Both A and C"], ans: 3 },
+  { q: "What is a 'Catalog Item' in ServiceNow?", opts: ["A report template","A service offered to users through Service Catalog","A configuration item","A type of SLA"], ans: 1 },
+  { q: "What does 'Priority' in an Incident depend on?", opts: ["Only urgency","Only impact","Both impact and urgency","Assignment group"], ans: 2 },
+  { q: "In ServiceNow CSA exam, how many questions are there?", opts: ["50","60","75","100"], ans: 1 },
+  { q: "What is 'Update Set' in ServiceNow?", opts: ["A batch of database records","A collection of customizations to move between instances","A set of user preferences","A report filter"], ans: 1 },
+  { q: "Which ITSM process handles planned modifications to IT services?", opts: ["Incident Management","Problem Management","Change Management","Service Request Management"], ans: 2 }
+];
+
+// ===================== STATE =====================
+let currentQ = 0, answers = [], timerInterval = null;
+let timeLeft = 20 * 60, startTime = null, tabSwitches = 0;
+let studentPhone = "", submitted = false;
+let results = JSON.parse(localStorage.getItem("snResults") || "[]");
+
+function saveResults() { localStorage.setItem("snResults", JSON.stringify(results)); }
+
+// ===================== SCREENS =====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ===================== LOGIN =====================
+function startExam() {
+  const phone = document.getElementById('phoneInput').value.trim();
+  const pass = document.getElementById('passInput').value.trim();
+  const err = document.getElementById('loginError');
+  if (!/^\d{4}$/.test(phone)) { err.textContent = "❌ Please enter exactly 4 digits of your phone number."; return; }
+  if (pass !== STUDENT_PASS) { err.textContent = "❌ Invalid password. Please check with your instructor."; return; }
+  // Check if already attempted
+  if (results.find(r => r.phone === phone)) { err.textContent = "⚠️ You have already attempted this exam."; return; }
+  studentPhone = phone;
+  answers = new Array(25).fill(-1);
+  currentQ = 0; tabSwitches = 0; submitted = false;
+  document.getElementById('studentLabel').textContent = `Student: ****${phone}`;
+  showScreen('quizScreen');
+  loadQuestion();
+  startTimer();
+  setupTabDetection();
+}
+
+// ===================== TIMER =====================
+function startTimer() {
+  startTime = Date.now();
+  timeLeft = 20 * 60;
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+    const display = document.getElementById('timerDisplay');
+    display.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    display.className = 'timer' + (timeLeft <= 60 ? ' warn' : '');
+    if (timeLeft <= 0) submitExam(true);
+  }, 1000);
+}
+
+// ===================== TAB DETECTION =====================
+function setupTabDetection() {
+  document.addEventListener('visibilitychange', handleVisibility);
+  window.addEventListener('blur', handleBlur);
+}
+function handleVisibility() { if (document.hidden && !submitted) warnTab(); }
+function handleBlur() { if (!submitted) warnTab(); }
+function warnTab() {
+  tabSwitches++;
+  const w = document.getElementById('tabWarn');
+  if (tabSwitches >= 3) {
+    w.style.display = 'block';
+    w.textContent = `⚠️ Warning ${tabSwitches}/3: Tab switched! Auto-submitting exam...`;
+    setTimeout(() => submitExam(true), 1500);
+  } else {
+    w.style.display = 'block';
+    w.textContent = `⚠️ Warning ${tabSwitches}/3: Do not switch tabs! Third violation = Auto Submit.`;
+  }
+}
+
+// ===================== QUESTIONS =====================
+function loadQuestion() {
+  const q = questions[currentQ];
+  document.getElementById('qText').innerHTML = `<span class="q-num">Q${currentQ+1}.</span> ${q.q}`;
+  document.getElementById('qCount').textContent = `Q ${currentQ+1}/25`;
+  document.getElementById('progressFill').style.width = `${((currentQ+1)/25)*100}%`;
+  const opts = document.getElementById('optionsDiv');
+  opts.innerHTML = '';
+  q.opts.forEach((o, i) => {
+    const div = document.createElement('div');
+    div.className = 'option' + (answers[currentQ] === i ? ' selected' : '');
+    div.innerHTML = `<input type="radio" name="opt" value="${i}" ${answers[currentQ]===i?'checked':''}> ${String.fromCharCode(65+i)}. ${o}`;
+    div.onclick = () => selectAnswer(i);
+    opts.appendChild(div);
+  });
+  const nb = document.getElementById('nextBtn');
+  if (currentQ === 24) { nb.textContent = '✅ Submit'; nb.className = 'btn-nav btn-submit'; nb.onclick = () => confirmSubmit(); }
+  else { nb.textContent = 'Next →'; nb.className = 'btn-nav btn-next'; nb.onclick = nextQ; }
+}
+function selectAnswer(i) {
+  answers[currentQ] = i;
+  document.querySelectorAll('.option').forEach((d,idx) => d.className = 'option' + (idx===i?' selected':''));
+}
+function nextQ() { if (currentQ < 24) { currentQ++; loadQuestion(); } }
+function prevQ() { if (currentQ > 0) { currentQ--; loadQuestion(); } }
+function confirmSubmit() {
+  const unanswered = answers.filter(a => a === -1).length;
+  if (unanswered > 0) { if (!confirm(`You have ${unanswered} unanswered question(s). Submit anyway?`)) return; }
+  submitExam(false);
+}
+
+// ===================== SUBMIT =====================
+function submitExam(auto) {
+  if (submitted) return;
+  submitted = true;
+  clearInterval(timerInterval);
+  document.removeEventListener('visibilitychange', handleVisibility);
+  window.removeEventListener('blur', handleBlur);
+  const elapsed = Math.floor((Date.now() - startTime) / 1000);
+  const mins = Math.floor(elapsed / 60), secs = elapsed % 60;
+  const timeTaken = `${mins}m ${secs}s`;
+  let score = 0;
+  answers.forEach((a, i) => { if (a === questions[i].ans) score++; });
+  const entry = { phone: studentPhone, score, time: elapsed, timeTaken, date: new Date().toLocaleString() };
+  results.push(entry);
+  saveResults();
+  sendEmail(entry);
+  showResult(score, elapsed, timeTaken);
+}
+
+// ===================== EMAIL (EmailJS simulation) =====================
+function sendEmail(entry) {
+  // Uses EmailJS public API — replace with your EmailJS credentials for production
+  console.log(`Result for ${entry.phone}: ${entry.score}/25 in ${entry.timeTaken} → ${RESULT_EMAIL}`);
+  // To enable real email: sign up at emailjs.com, get service/template IDs and replace below
+  // emailjs.send("serviceID","templateID",{to_email:RESULT_EMAIL, phone:entry.phone, score:entry.score, time:entry.timeTaken});
+}
+
+// ===================== RESULT SCREEN =====================
+function showResult(score, elapsed, timeTaken) {
+  showScreen('resultScreen');
+  document.getElementById('scoreNum').textContent = score;
+  const pct = (score / 25) * 360;
+  document.getElementById('scoreCircle').style.setProperty('--pct', pct + 'deg');
+  const pass = score >= 13;
+  document.getElementById('resultMsg').innerHTML = pass
+    ? `🎉 <strong style="color:#00c853">Congratulations! You Passed!</strong>`
+    : `😔 <strong style="color:#ff5252">Better Luck Next Time!</strong>`;
+  document.getElementById('timeTaken').textContent = timeTaken;
+  // Check if 8 PM unlock
+  const now = new Date();
+  const lockMsg = document.getElementById('lockMsg');
+  if (now.getHours() >= UNLOCK_HOUR) {
+    lockMsg.innerHTML = '✅ Leaderboard is now unlocked! <button class="btn btn-primary" style="margin-top:10px;padding:8px" onclick="showLeaderboard()">View Leaderboard 🏆</button>';
+  }
+  // Answer review
+  let rev = '<h3 style="margin:15px 0 10px;color:#00e5ff;">📝 Answer Review</h3>';
+  questions.forEach((q, i) => {
+    const correct = q.ans === answers[i];
+    rev += `<div class="ans-item ${correct?'':'wrong'}">
+      <div class="ans-q">Q${i+1}. ${q.q}</div>
+      <div class="ans-correct">✅ Correct: ${q.opts[q.ans]}</div>
+      ${!correct ? `<div class="ans-yours">❌ Your Answer: ${answers[i]===-1?'Not answered':q.opts[answers[i]]}</div>` : ''}
+    </div>`;
+  });
+  document.getElementById('answerReview').innerHTML = rev;
+}
+
+// ===================== LEADERBOARD =====================
+function showLeaderboard() {
+  showScreen('leaderScreen');
+  renderLeaderboard();
+}
+function renderLeaderboard() {
+  const sorted = [...results].sort((a,b) => b.score - a.score || a.time - b.time);
+  let html = `<p style="color:#b0bec5;font-size:0.85em;margin-bottom:10px;">Total Students: ${sorted.length}</p>`;
+  html += `<table class="lb-table"><tr><th>Rank</th><th>Student ID</th><th>Marks</th><th>Time Taken</th><th>Status</th></tr>`;
+  sorted.forEach((r, i) => {
+    const rank = i + 1;
+    const rankClass = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'';
+    const medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
+    const pass = r.score >= 13;
+    html += `<tr>
+      <td class="${rankClass}">${medal} ${rank}</td>
+      <td>****${r.phone}</td>
+      <td class="${rankClass}">${r.score}/25</td>
+      <td>${r.timeTaken}</td>
+      <td><span class="badge ${pass?'badge-pass':'badge-fail'}">${pass?'PASS':'FAIL'}</span></td>
+    </tr>`;
+  });
+  html += '</table>';
+  document.getElementById('lbContent').innerHTML = html;
+}
+
+// ===================== ADMIN =====================
+function showAdminLogin() { showScreen('adminLoginScreen'); }
+function adminLogin() {
+  const p = document.getElementById('adminPassInput').value;
+  if (p !== ADMIN_PASS) { document.getElementById('adminError').textContent = "❌ Wrong password!"; return; }
+  showScreen('leaderScreen');
+  const sorted = [...results].sort((a,b) => b.score - a.score || a.time - b.time);
+  let html = `<div style="background:rgba(255,193,7,0.1);border:1px solid #ffc107;border-radius:10px;padding:10px;margin-bottom:15px;color:#ffc107;font-size:0.85em;">👑 Admin View — All results visible • Email: ${RESULT_EMAIL}</div>`;
+  html += `<p style="color:#b0bec5;font-size:0.85em;margin-bottom:10px;">Total Students Attempted: ${sorted.length}</p>`;
+  html += `<table class="lb-table"><tr><th>Rank</th><th>Phone</th><th>Marks</th><th>Time</th><th>Date</th><th>Status</th></tr>`;
+  sorted.forEach((r, i) => {
+    const rank = i+1, medal = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
+    const pass = r.score >= 13;
+    html += `<tr><td>${medal}${rank}</td><td>****${r.phone}</td><td>${r.score}/25</td><td>${r.timeTaken}</td><td style="font-size:0.75em">${r.date}</td><td><span class="badge ${pass?'badge-pass':'badge-fail'}">${pass?'PASS':'FAIL'}</span></td></tr>`;
+  });
+  html += '</table>';
+  if (sorted.length === 0) html += '<p style="text-align:center;color:#b0bec5;margin-top:20px;">No students have attempted yet.</p>';
+  html += `<button class="btn btn-admin" style="margin-top:15px" onclick="clearResults()">🗑️ Clear All Results</button>`;
+  document.getElementById('lbContent').innerHTML = html;
+}
+function clearResults() {
+  if (confirm("Clear ALL results? This cannot be undone.")) { results = []; saveResults(); adminLogin(); }
+}
+</script>
+</body>
+</html>
